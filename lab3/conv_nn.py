@@ -11,7 +11,7 @@ DATA_TE_Y = 'te_y'
 HIDDEN_FC_LAYER_WEIGHT = 'HFCL'
 OUT_FC_LAYER_WEIGHT = 'OFCL'
 PRINT_TRAIN_OUTPUT = True
-DISPLAY_FREQUENCY = 10
+DISPLAY_FREQUENCY = 100
 
 # Hyper Params
 HP_BATCH_SIZE = 'batch_size'
@@ -81,9 +81,14 @@ class ConvNN:
     def init_layers(self):
         in_nn_reshaped = tf.reshape(self.nn_in, [-1, 28, 28, 1])
 
-        conv1 = self.conv_layer(in_nn_reshaped, 1, 32, [5, 5], f'{HIDDEN_FC_LAYER_WEIGHT}0', 0)
-        conv2 = self.conv_layer(conv1, 32, 64, [10, 10], f'{HIDDEN_FC_LAYER_WEIGHT}1', 1)
-        fc = self.full_connected_layer(conv2, self.units, f'{HIDDEN_FC_LAYER_WEIGHT}2', 2)
+        l1 = self.conv_layer(in_nn_reshaped, 1, 64, [5, 5], f'{HIDDEN_FC_LAYER_WEIGHT}0', 0)
+
+        # 1 Without max pool
+        # l2 = self.conv_layer(l1, 32, 64, [10, 10], f'{HIDDEN_FC_LAYER_WEIGHT}1', 1)
+
+        # 2 With max pool
+        l2 = self.max_pool(l1, [2, 2])
+        fc = self.full_connected_layer(l2, self.units, f'{HIDDEN_FC_LAYER_WEIGHT}1', 1)
 
         self.output_logits = self.full_connected_layer(fc, self.out_size, OUT_FC_LAYER_WEIGHT, output=True)
 
@@ -97,7 +102,11 @@ class ConvNN:
         l2_penalty = 0
 
         weights = []
-        for i in range(3):
+        # 1 Without max pool
+        # for i in range(3):
+
+        # 2 With max pool
+        for i in range(2):
             weights.append(get_tensor_by_name(f'W_HFCL{i}'))
         weights.append(get_tensor_by_name('W_OFCL'))
 
@@ -143,6 +152,11 @@ class ConvNN:
 
         self.optimizer = optimizer
 
+    def max_pool(self, input_data, pool_shape):
+        ksize = [1, pool_shape[0], pool_shape[1], 1]
+        strides = [1, 2, 2, 1]
+        return tf.nn.max_pool(input_data, ksize=ksize, strides=strides, padding='SAME')
+
     def conv_layer(self, input_data, num_input_channels, num_filters, filter_shape, name, layer_number=None):
         conv_filt_shape = [filter_shape[0], filter_shape[1], num_input_channels, num_filters]
 
@@ -155,11 +169,6 @@ class ConvNN:
 
         if self.use_dropout:
             out_layer = tf.nn.dropout(out_layer, rate=self.dropout_rate[layer_number])
-
-        # now perform max pooling
-        # ksize = [1, pool_shape[0], pool_shape[1], 1]
-        # strides = [1, 2, 2, 1]
-        # out_layer = tf.nn.max_pool(out_layer, ksize=ksize, strides=strides, padding='SAME')
 
         return out_layer
 

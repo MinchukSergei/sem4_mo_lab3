@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from lab1 import small_data, split_data, get_unique_data, encode_classes, generate_one_hot_encoded_class
+from lab1 import small_data, large_data, split_data, get_unique_data, encode_classes, generate_one_hot_encoded_class
 
 from lab3.conv_nn import HP_BATCH_SIZE, HP_LEARNING_RATE, HP_UNITS, HP_L1_SCALE, HP_L2_SCALE, ConvNN
 from lab3.conv_nn import DATA_TR_X, DATA_TR_Y, DATA_V_X, DATA_TE_X, DATA_TE_Y, DATA_V_Y
@@ -86,9 +86,9 @@ def main():
             HP_LEARNING_RATE: [0.003],
             HP_UNITS: [512],
             HP_L1_SCALE: [0],
-            HP_L2_SCALE: [0.0005],
-            HP_DROPOUT_RATE: [[0.01, 0.3, 0.5]],
-            HP_DECAY_RATE: [0.8],
+            HP_L2_SCALE: [0.00005],
+            HP_DROPOUT_RATE: [[0.05, 0.1, 0.4]],
+            HP_DECAY_RATE: [0.80],
             HP_ACT_FUNC: [tf.nn.relu],
             HP_EPOCHS: [100]
         },
