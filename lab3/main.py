@@ -7,6 +7,7 @@ from lab3.conv_nn import DATA_TR_X, DATA_TR_Y, DATA_V_X, DATA_TE_X, DATA_TE_Y, D
 from lab3.conv_nn import HP_DROPOUT_RATE, HP_DECAY_RATE, HP_ACT_FUNC, HP_EPOCHS
 from lab3.grid_search import GridSearch
 from lab3.conv_nn import reset_graph
+from lab3.le_net_5 import LeNet5
 
 RND_SEED = None
 tf.random.set_random_seed(RND_SEED)
@@ -44,7 +45,38 @@ decay_rate = 0.95
 def main():
     tr_x, tr_y, v_x, v_y, te_x, te_y = prepare_data(small_data)
 
-    fc_nn = ConvNN(
+    # fc_nn = ConvNN(
+    #     {
+    #         DATA_TR_X: tr_x,
+    #         DATA_TR_Y: tr_y,
+    #         DATA_V_X: v_x,
+    #         DATA_V_Y: v_y,
+    #         DATA_TE_X: te_x,
+    #         DATA_TE_Y: te_y
+    #     },
+    #     img_size,
+    #     img_classes
+    # )
+
+    # grid_search = GridSearch(
+    #     fc_nn,
+    #     {
+    #         HP_BATCH_SIZE: [300],
+    #         HP_LEARNING_RATE: [0.003],
+    #         HP_UNITS: [512],
+    #         HP_L1_SCALE: [0],
+    #         HP_L2_SCALE: [0.00005],
+    #         HP_DROPOUT_RATE: [[0.05, 0.1, 0.4]],
+    #         HP_DECAY_RATE: [0.80],
+    #         HP_ACT_FUNC: [tf.nn.relu],
+    #         HP_EPOCHS: [100]
+    #     },
+    #     fit_model,
+    #     'accuracy',
+    #     1
+    # )
+
+    lenet5 = LeNet5(
         {
             DATA_TR_X: tr_x,
             DATA_TR_Y: tr_y,
@@ -57,40 +89,18 @@ def main():
         img_classes
     )
 
-    # grid_search = GridSearch(
-    #     fc_nn,
-    #     {
-    #         HP_BATCH_SIZE: np.linspace(50, 500, 3, dtype='int16'),
-    #         HP_LEARNING_RATE: np.linspace(0.001, 0.01, 3),
-    #         HP_UNITS: [
-    #             *[[x] * y for x in [50, 100, 300, 500, 700] for y in range(1, 6)],
-    #             [50, 100, 200, 300, 500],
-    #             [500, 300, 200, 100, 50]
-    #         ],
-    #         HP_L1_SCALE: np.linspace(0, 0.3, 3),
-    #         HP_L2_SCALE: np.linspace(0, 0.3, 3),
-    #         HP_DROPOUT_RATE: np.linspace(0.05, 0.2, 3),
-    #         HP_DECAY_RATE: np.linspace(1, 0.9, 3),
-    #         HP_ACT_FUNC: [tf.nn.relu, tf.nn.sigmoid, tf.nn.tanh, tf.nn.elu],
-    #         HP_EPOCHS: [5]
-    #     },
-    #     fit_model,
-    #     'accuracy',
-    #     10
-    # )
-
     grid_search = GridSearch(
-        fc_nn,
+        lenet5,
         {
-            HP_BATCH_SIZE: [300],
-            HP_LEARNING_RATE: [0.003],
-            HP_UNITS: [512],
+            HP_BATCH_SIZE: [128],
+            HP_LEARNING_RATE: [0.005],
+            HP_UNITS: [[120, 84]],
             HP_L1_SCALE: [0],
-            HP_L2_SCALE: [0.00005],
-            HP_DROPOUT_RATE: [[0.05, 0.1, 0.4]],
-            HP_DECAY_RATE: [0.80],
+            HP_L2_SCALE: [0.0001],
+            HP_DROPOUT_RATE: [[0.1, 0.2, 0.3, 0.4]],
+            HP_DECAY_RATE: [0.85],
             HP_ACT_FUNC: [tf.nn.relu],
-            HP_EPOCHS: [100]
+            HP_EPOCHS: [1000]
         },
         fit_model,
         'accuracy',
